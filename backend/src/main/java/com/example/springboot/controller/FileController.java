@@ -15,6 +15,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/files")
@@ -95,41 +97,48 @@ public class FileController {
     @PostMapping("/send-for-inspection/{flag}")
     public ResponseEntity<?> sendForInspection(@PathVariable String flag) {
         try {
-            // 构造文件路径
-            String filePath = "C:\\Users\\zeyzey\\IdeaProjects\\springboot\\file\\" + flag + ".png";
-            FileSystemResource fileResource = new FileSystemResource(filePath);
+            // 与 /files/upload 使用同一目录，避免硬编码旧项目路径导致找不到文件
+            File imageFile = new File(filePath + flag + ".png");
+            if (!imageFile.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("送检失败: 未找到图像文件，请先上传或检查后端工作目录下的 file 文件夹: " + imageFile.getAbsolutePath());
+            }
+            FileSystemResource fileResource = new FileSystemResource(imageFile);
 
             // 创建 MultiValueMap 用来封装文件参数
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", fileResource);
+            MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
+            multipartBody.add("file", fileResource);
 
             // 设置请求头
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // 创建 HttpEntity 对象
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(multipartBody, headers);
 
             // 发送 POST 请求到推理服务
-            ResponseEntity<String> response = restTemplate.postForEntity("http://127.0.0.1:5000/predict", requestEntity, String.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity("http://127.0.0.1:5000/predict", requestEntity, Map.class);
 
             // 检查响应状态并处理结果
             if (response.getStatusCode() == HttpStatus.OK) {
-                String status = response.getBody();
-
-                String change = response.getBody();
-                String targetContent = "\\u9634\\u6027";
-
-                if (change.contains(targetContent)) {
-                    change = "阴性";
-                } else {
-                    change = "疑似阳性";
+                Map<?, ?> predictBody = response.getBody();
+                String result = predictBody != null && predictBody.get("result") != null ? String.valueOf(predictBody.get("result")) : "未知";
+                Double confidence = null;
+                if (predictBody != null && predictBody.get("confidence") != null) {
+                    try {
+                        confidence = Double.parseDouble(String.valueOf(predictBody.get("confidence")));
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
 
                 // 这里可以添加更新数据库状态的代码
 
-                userService.updateStatusInDatabase(flag,change);
-                return ResponseEntity.ok().body(status);
+                userService.updateStatusInDatabase(flag, result, confidence);
+
+                Map<String, Object> resultBody = new HashMap<>();
+                resultBody.put("result", result);
+                resultBody.put("confidence", confidence);
+                return ResponseEntity.ok().body(resultBody);
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process image");
             }

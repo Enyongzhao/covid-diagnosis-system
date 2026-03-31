@@ -20,8 +20,8 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return saveOrUpdate(user);
     }
 
-    public void updateStatusInDatabase(String img, String status) {
-        userMapper.updateStatus(img, status);
+    public void updateStatusInDatabase(String img, String status, Double confidence) {
+        userMapper.updateStatusAndConfidence(img, status, confidence);
     }
 
 }

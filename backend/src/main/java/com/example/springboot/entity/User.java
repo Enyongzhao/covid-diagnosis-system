@@ -18,6 +18,7 @@ public class User {
     private  String description;
     private  String plan;
     private  String status;
+    private  Double confidence;
     private  String img;
     private  String result;
     private  Integer queue;
@@ -92,6 +93,14 @@ public class User {
 
     public void setImg(String img) {
         this.img = img;
+    }
+
+    public Double getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(Double confidence) {
+        this.confidence = confidence;
     }
 
     public String getResult() {

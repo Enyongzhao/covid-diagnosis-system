@@ -1,15 +1,15 @@
 <template>
-  <div>
-    <el-form ref="form" :model="form" :rules="rules" class="login-box">
-      <h3 class="login-title">欢迎使用辅助诊断医疗系统</h3>
+  <div class="login-page">
+    <el-form ref="form" :model="form" :rules="rules" class="login-box" label-position="top">
+      <h3 class="login-title">辅助诊断医疗系统</h3>
       <el-form-item label="账号" prop="name">
         <el-input type="text" placeholder="请输入用户名" v-model="form.name"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input type="password" placeholder="请输入密码" v-model="form.password"></el-input>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm('form')">登录</el-button>
+      <el-form-item class="login-btn-item">
+        <el-button type="primary" class="login-btn" @click="submitForm('form')">登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -72,23 +72,58 @@ export default {
 
 
 <style lang="scss" scoped>
+.login-page {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e6f7e6 0%, #d5f0d5 100%);
+}
+
 .login-box {
-  width: 300px;
-  margin: 120px auto;
-  border: 1px solid #DCDFE6;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 30px #DCDFE6;
+  width: 420px;
+  max-width: 100%;
+  border: 1px solid #d9ead9;
+  padding: 30px 28px 18px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(71, 143, 71, 0.16);
+  transform: translateY(-60px); /* 负数=上移 */
 }
 
 .login-title {
   text-align: center;
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #2f5f2f;
 }
 
-.page-background {
-  background-color: rgb(48, 65, 86); /* 设置除表单外的背景颜色 */
-  min-height: 100vh; /* 确保整个视口高度都被背景色覆盖 */
-  padding: 20px; /* 如果需要，可以添加一些内边距 */
+.login-subtitle {
+  margin: 0 0 20px;
+  text-align: center;
+  color: #6b8d6b;
+  font-size: 14px;
+}
+
+.login-btn-item {
+  margin-top: 8px;
+}
+
+.login-btn {
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #69b56f;
+}
+
+.login-btn:hover,
+.login-btn:focus {
+  background-color: #5aa260;
 }
 </style>
 

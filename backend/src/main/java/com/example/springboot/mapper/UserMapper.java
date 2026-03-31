@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-    void updateStatus(@Param("img") String img, @Param("status") String status);
+    void updateStatusAndConfidence(@Param("img") String img, @Param("status") String status, @Param("confidence") Double confidence);
 
 
 }

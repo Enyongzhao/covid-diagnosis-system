@@ -18,6 +18,11 @@
             <el-table-column prop="sex" label="性别" width="60"></el-table-column>
             <el-table-column prop="description" label="病情描述" width="230"></el-table-column>
             <el-table-column prop="status" label="辅助诊断结果" ></el-table-column>
+            <el-table-column label="置信度" width="110">
+              <template v-slot="scope">
+                {{ scope.row.confidence !== null && scope.row.confidence !== undefined && scope.row.confidence !== '' ? scope.row.confidence + '%' : '' }}
+              </template>
+            </el-table-column>
             <el-table-column  label="CT图像">
               <template v-slot="scope">
                 <div class="demo-image__preview">
@@ -172,7 +177,8 @@ export default {
             // 处理正常响应
             console.log(response.result);
             row.status = response.result;
-            this.$message.success('患者"'+row.name+'"的辅助诊断结果为:'+ response.result);
+            row.confidence = response.confidence;
+            this.$message.success('患者"'+row.name+'"的辅助诊断结果为:'+ response.result + (response.confidence != null ? `（置信度 ${response.confidence}%）` : ''));
           })
           .catch(error => {
             console.error('送检错误:', error);
